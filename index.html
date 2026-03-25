@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>돈나무 | 제주 숙성 흑돼지</title>
+
+    <!-- PWA 홈화면 아이콘 -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#1a0e05">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="돈나무">
+    <link rel="apple-touch-icon" href="imeges/icon-192.png">
+
+    <!-- SNS 공유 미리보기 -->
+    <meta property="og:title" content="돈나무 | 제주 숙성 흑돼지">
+    <meta property="og:description" content="제주산 100% 흑돼지 25~30일 숙성 전문점 | 제주공항 8분">
+    <meta property="og:image" content="imeges/hero.png">
+
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Noto+Sans+KR:wght@300;400;500&family=Noto+Sans+SC:wght@300;400;500&display=swap" rel="stylesheet">
+
+    <style>
+        /* ================================================
+           CSS 변수 — 색상/폰트 수정은 여기서만 하세요
+           ================================================ */
+        :root {
+            --bg:        #faf7f2;
+            --bg2:       #f2ece0;
+            --dark:      #1a0e05;
+            --gold:      #A0733A;
+            --gold-lt:   #C9943A;
+            --text:      #2a1f12;
+            --muted:     #7a6a55;
+            --border:    rgba(160,115,58,0.2);
+            --serif:     'Playfair Display', serif;
+            --sans:      'Noto Sans KR', 'Noto Sans SC', sans-serif;
+        }
+
+        *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+        html  { scroll-behavior:smooth; }
+        body  { background:var(--bg); color:var(--text); font-family:var(--sans); font-weight:300; line-height:1.75; }
+
+        /* ================================================
+           네비게이션 — 섹션 이동 링크 없음
+           ================================================ */
+        nav {
+            position:fixed; top:0; width:100%; z-index:200;
+            padding:14px 28px;
+            display:flex; justify-content:space-between; align-items:center;
+            background:rgba(250,247,242,.96);
+            border-bottom:1px solid var(--border);
+            backdrop-filter:blur(8px);
+        }
+        .nav-logo {
+            font-family:var(--serif); font-size:1.5rem;
+            color:var(--gold); letter-spacing:.12em; text-decoration:none;
+        }
+        .nav-right { display:flex; align-items:center; gap:8px; }
+        .lang-btn, .share-btn {
+            background:none; border:1px solid var(--border); color:var(--muted);
+            padding:5px 13px; font-size:.7rem; cursor:pointer; letter-spacing:.08em;
+            font-family:var(--sans); transition:all .25s;
+        }
+        .lang-btn.active, .lang-btn:hover,
+        .share-btn:hover { border-color:var(--gold); color:var(--gold); }
+
+        /* ================================================
+           히어로 슬라이드쇼 — 3장 페이드 전환
+           ================================================ */
+        #hero {
+            height:100vh; position:relative;
+            display:flex; align-items:center; justify-content:center; overflow:hidden;
+        }
+        .hero-slide {
+            position:absolute; inset:0;
+            background-size:cover; background-position:center;
+            filter:brightness(.58);
+            opacity:0; transition:opacity 1.8s ease-in-out;
+        }
+        .hero-slide.active { opacity:1; }
+        .hero-overlay {
+            position:absolute; inset:0;
+            background:linear-gradient(to bottom, rgba(26,14,5,.05) 40%, var(--bg) 100%);
+        }
+        .hero-content { position:relative; z-index:1; text-align:center; color:#fff; }
+        .hero-tag {
+            font-size:.65rem; letter-spacing:.42em; color:rgba(255,255,255,.72);
+            text-transform:uppercase; margin-bottom:18px;
+            opacity:0; animation:up .8s .3s forwards;
+        }
+        .hero-name {
+            font-family:var(--serif); font-size:clamp(4rem,12vw,9rem);
+            font-weight:700; letter-spacing:.16em; line-height:1;
+            opacity:0; animation:up .8s .5s forwards;
+        }
+        .hero-sub {
+            margin-top:22px; font-size:.7rem; letter-spacing:.32em;
+            color:rgba(255,255,255,.52); text-transform:uppercase;
+            opacity:0; animation:up .8s .7s forwards;
+        }
+
+        /* ================================================
+           소개 섹션
+           ================================================ */
+        #about {
+            display:grid; grid-template-columns:1fr 1fr; gap:64px; align-items:center;
+            padding:100px 48px; max-width:1100px; margin:0 auto;
+        }
+        .about-imgs { position:relative; height:480px; }
+        .about-img-main {
+            position:absolute; width:82%; height:82%; top:0; left:0;
+            object-fit:cover; border:1px solid var(--border);
+        }
+        .about-img-sub {
+            position:absolute; width:52%; height:52%; bottom:0; right:0;
+            object-fit:cover; border:1px solid var(--border);
+            box-shadow:-12px -12px 0 var(--bg);
+        }
+        .sec-label { font-size:.66rem; letter-spacing:.4em; color:var(--gold); text-transform:uppercase; margin-bottom:12px; }
+        .sec-title { font-family:var(--serif); font-size:clamp(1.8rem,3.5vw,2.8rem); font-weight:600; line-height:1.25; margin-bottom:28px; }
+        .gold-line { width:44px; height:1px; background:var(--gold); margin:20px 0 28px; }
+        .about-desc { font-size:.88rem; color:var(--muted); line-height:2; margin-bottom:32px; }
+        .info-row { display:grid; grid-template-columns:110px 1fr; font-size:.82rem; border-bottom:1px solid var(--border); padding:12px 0; }
+        .info-lbl { color:var(--gold); font-size:.7rem; letter-spacing:.08em; align-self:center; }
+
+        /* ================================================
+           메뉴 섹션 — 카드 그리드
+           ================================================ */
+        #menu { background:var(--bg2); padding:90px 48px; }
+        .menu-inner { max-width:1100px; margin:0 auto; }
+        .menu-grid {
+            display:grid; grid-template-columns:repeat(auto-fill, minmax(230px,1fr));
+            gap:18px; margin-top:40px;
+        }
+        .menu-card {
+            background:var(--bg); border:1px solid var(--border);
+            overflow:hidden; position:relative;
+            transition:transform .3s, border-color .3s;
+            box-shadow:0 2px 10px rgba(0,0,0,.05);
+        }
+        .menu-card:hover { transform:translateY(-5px); border-color:var(--gold); }
+        .menu-img { width:100%; height:165px; object-fit:cover; display:block; }
+        .menu-img-ph {
+            width:100%; height:165px;
+            background:linear-gradient(135deg,#e8dfd0,#f2ece0);
+            display:flex; align-items:center; justify-content:center;
+            color:var(--muted); font-size:.72rem; letter-spacing:.1em;
+        }
+        .menu-body { padding:16px 18px; }
+        .menu-name { font-size:.9rem; font-weight:500; color:var(--text); margin-bottom:4px; }
+        .menu-name-sub { font-size:.73rem; color:var(--muted); margin-bottom:10px; }
+        .menu-price { font-family:var(--serif); font-size:1rem; color:var(--gold); }
+        .badge {
+            position:absolute; top:10px; left:10px;
+            background:var(--gold); color:#fff;
+            font-size:.58rem; font-weight:700; letter-spacing:.08em;
+            padding:3px 8px; text-transform:uppercase;
+        }
+        .menu-loading { text-align:center; padding:72px 0; color:var(--muted); font-size:.82rem; letter-spacing:.18em; }
+
+        /* ================================================
+           오시는 길 + 연락처 (다크 섹션)
+           ================================================ */
+        #info { background:var(--dark); padding:80px 48px 0; }
+        .info-inner { max-width:1100px; margin:0 auto; }
+        .info-label { font-size:.66rem; letter-spacing:.4em; color:var(--gold); text-transform:uppercase; margin-bottom:12px; }
+        .info-title { font-family:var(--serif); font-size:clamp(1.6rem,3vw,2.4rem); color:#fff; margin-bottom:32px; }
+
+        .interior-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:40px; }
+        .interior-grid img { width:100%; height:220px; object-fit:cover; opacity:.8; }
+
+        .map-wrap { width:100%; height:360px; overflow:hidden; border:1px solid rgba(255,255,255,.08); margin-bottom:48px; }
+        .map-wrap iframe { width:100%; height:100%; border:none; }
+
+        .bottom-grid { display:grid; grid-template-columns:1fr 1fr; gap:48px; padding-bottom:60px; }
+        .bottom-block h3 { font-size:.62rem; letter-spacing:.32em; color:var(--gold); text-transform:uppercase; margin-bottom:16px; }
+        .bottom-block p { font-size:.82rem; color:rgba(255,255,255,.55); line-height:2; }
+
+        .contact-btns { display:flex; flex-direction:column; gap:10px; }
+        .c-btn {
+            display:flex; align-items:center; gap:10px;
+            padding:13px 18px; border:1px solid rgba(255,255,255,.12);
+            color:rgba(255,255,255,.7); text-decoration:none;
+            font-size:.8rem; font-family:var(--sans); transition:all .25s;
+            background:none; cursor:pointer; width:100%; text-align:left;
+        }
+        .c-btn:hover { border-color:var(--gold); color:var(--gold); }
+        .c-btn.disabled { opacity:.25; pointer-events:none; }
+
+        footer {
+            text-align:center; padding:22px;
+            border-top:1px solid rgba(255,255,255,.06);
+            color:rgba(255,255,255,.2); font-size:.65rem; letter-spacing:.1em;
+        }
+
+        /* ================================================
+           애니메이션
+           ================================================ */
+        @keyframes up {
+            from { opacity:0; transform:translateY(14px); }
+            to   { opacity:1; transform:translateY(0); }
+        }
+
+        /* ================================================
+           모바일 반응형
+           ================================================ */
+        @media (max-width:768px) {
+            nav { padding:12px 16px; }
+            #about { grid-template-columns:1fr; padding:60px 20px; gap:40px; }
+            .about-imgs { height:280px; }
+            #menu { padding:60px 16px; }
+            #info { padding:60px 16px 0; }
+            .interior-grid img { height:140px; }
+            .bottom-grid { grid-template-columns:1fr; gap:32px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- 네비게이션 -->
+<nav>
+    <a class="nav-logo" href="#">돈나무</a>
+    <div class="nav-right">
+        <button class="lang-btn active" onclick="setLang('ko')">KO</button>
+        <button class="lang-btn"        onclick="setLang('zh')">中文</button>
+        <button class="lang-btn"        onclick="setLang('en')">EN</button>
+        <button class="share-btn"       onclick="sharePage()">↑ <span data-i18n="btn_share">공유</span></button>
+    </div>
+</nav>
+
+<!-- 히어로 슬라이드쇼 -->
+<div id="hero">
+    <div class="hero-slide active" style="background-image:url('imeges/hero.png')"></div>
+    <div class="hero-slide"        style="background-image:url('imeges/interior-1.png')"></div>
+    <div class="hero-slide"        style="background-image:url('imeges/interior-2.png')"></div>
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+        <p class="hero-tag"  data-i18n="hero_tag">제주 숙성 흑돼지 전문점</p>
+        <h1 class="hero-name">돈나무</h1>
+        <p class="hero-sub"  data-i18n="hero_sub">JEJU · PREMIUM AGED BLACK PORK</p>
+    </div>
+</div>
+
+<!-- 소개 -->
+<div id="about">
+    <div class="about-imgs">
+        <img class="about-img-main" src="imeges/interior-1.png" alt="돈나무 내부" onerror="this.style.display='none'">
+        <img class="about-img-sub"  src="imeges/interior-2.png" alt="돈나무 내부" onerror="this.style.display='none'">
+    </div>
+    <div>
+        <p  class="sec-label"  data-i18n="about_lbl">About</p>
+        <h2 class="sec-title"  data-i18n="about_title">제주의 맛,<br>정성을 담다</h2>
+        <div class="gold-line"></div>
+        <p  class="about-desc" data-i18n="about_desc">제주산 100% 흑돼지를 25~30일간 저온 숙성하여 육질이 부드럽고 고소한 감칠맛이 극대화된 제주 대표 고깃집입니다. 제주공항 근처, 메종글래드호텔 인근에 위치해 관광객이 찾기 편합니다.</p>
+        <div class="info-row"><span class="info-lbl" data-i18n="il_hours">영업시간</span><span data-i18n="iv_hours">매일 12:00 ~ 익일 00:30</span></div>
+        <div class="info-row"><span class="info-lbl" data-i18n="il_lo">라스트오더</span><span>23:30</span></div>
+        <div class="info-row"><span class="info-lbl" data-i18n="il_addr">주소</span><span data-i18n="iv_addr">제주시 신광로10길 3</span></div>
+        <div class="info-row"><span class="info-lbl" data-i18n="il_tel">전화</span><span>010-9525-3888</span></div>
+    </div>
+</div>
+
+<!-- 메뉴 -->
+<div id="menu">
+    <div class="menu-inner">
+        <p  class="sec-label"  data-i18n="menu_lbl">Menu</p>
+        <h2 class="sec-title"  data-i18n="menu_title">메뉴</h2>
+        <div id="menu-grid" class="menu-grid">
+            <p class="menu-loading" data-i18n="menu_loading">메뉴를 불러오는 중...</p>
+        </div>
+    </div>
+</div>
+
+<!-- 오시는 길 + 연락처 -->
+<div id="info">
+    <div class="info-inner">
+
+        <div class="interior-grid">
+            <img src="imeges/interior-1.png" alt="돈나무 내부" onerror="this.style.display='none'">
+            <img src="imeges/interior-2.png" alt="돈나무 내부" onerror="this.style.display='none'">
+        </div>
+
+        <p  class="info-label" data-i18n="loc_lbl">Location</p>
+        <h2 class="info-title" data-i18n="loc_title">오시는 길</h2>
+        <div class="map-wrap">
+            <iframe
+                src="https://maps.google.com/maps?q=제주특별자치도+제주시+신광로10길+3&output=embed&hl=ko&z=16"
+                allowfullscreen loading="lazy">
+            </iframe>
+        </div>
+
+        <div class="bottom-grid">
+            <div class="bottom-block">
+                <h3 data-i18n="loc_how">찾아가는 방법</h3>
+                <p  data-i18n="loc_how_v">메종글래드호텔 옆집 · 드림타워 근처&#10;제주공항에서 약 8분 거리</p>
+            </div>
+            <div class="bottom-block">
+                <h3 data-i18n="contact_title">연락처</h3>
+                <div class="contact-btns">
+                    <a href="tel:010-9525-3888"  class="c-btn">📞 <span data-i18n="btn_call">전화하기</span></a>
+                    <a href="sms:010-9525-3888"  class="c-btn">💬 <span data-i18n="btn_sms">문자하기</span></a>
+                    <!-- 카카오/위챗 주소 생기면 href="#" 부분만 교체하세요 -->
+                    <button class="c-btn disabled">💚 <span data-i18n="btn_kakao">카카오톡 (준비중)</span></button>
+                    <button class="c-btn disabled">🟢 <span data-i18n="btn_wechat">위챗 (준비중)</span></button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <footer>© 2025 돈나무 · 제주시 신광로10길 3 · 010-9525-3888</footer>
+</div>
+
+<script>
+/* ================================================
+   구글 시트 CSV URL
+   시트 수정 후 저장하면 페이지에 자동 반영됩니다
+   ================================================ */
+const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRE0-2CKOI1DBNFzCWRhjm6G-WQdJubHhV8joYNRaFmM10OVSEn9tVPcxMqRAYPFn3YEySJxwyxh8TH/pub?output=csv';
+
+/* ================================================
+   폴백 데이터 — CSV 로드 실패시 이 데이터로 표시
+   ================================================ */
+const FALLBACK = [
+    { name:'숙성흑돼지모듬800g(3~4인)', price:85000, best:true  },
+    { name:'숙성흑돼지모듬600g(2~3인)', price:66000, best:true  },
+    { name:'숙성백돼지모듬600g',         price:52000, best:false },
+    { name:'숙성흑돼지오겹살200g',       price:22000, best:false },
+    { name:'숙성흑돼지목살200g',         price:22000, best:false },
+    { name:'숙성흑가브리살180g',         price:22000, best:false },
+    { name:'숙성황정살180g',             price:22000, best:false },
+    { name:'숙성불항정살200g',           price:22000, best:false },
+    { name:'양념갈비300g',               price:19000, best:false },
+    { name:'소갈비살 200g',              price:22000, best:false },
+    { name:'숙성백돼지오겹살200g',       price:18000, best:false },
+    { name:'숙성백돼지목살200g',         price:18000, best:false },
+    { name:'새우구이',                   price:10000, best:false },
+    { name:'목탄게란찜',                 price:5000,  best:false },
+    { name:'왕갈비탕',                   price:15000, best:false },
+    { name:'흑돼지김치찌개',             price:7000,  best:false },
+    { name:'된장찌개',                   price:6000,  best:false },
+    { name:'물냉면',                     price:7000,  best:false },
+    { name:'비빔냉면',                   price:7000,  best:false },
+    { name:'해물전',                     price:15000, best:false },
+    { name:'해물라면',                   price:9000,  best:false },
+    { name:'김치볶음밥',                 price:8000,  best:false },
+    { name:'떡볶이',                     price:6000,  best:false },
+    { name:'공기밥',                     price:1000,  best:false },
+];
+
+/* ================================================
+   메뉴 이름 번역 (한국어 → 중국어/영어)
+   새 메뉴 추가시 이 객체에도 추가하세요
+   ================================================ */
+const TR = {
+    '숙성흑돼지모듬800g(3~4인)': { zh:'熟成黑猪拼盘800g(3~4人)',  en:'Aged Black Pork Set 800g (3~4)' },
+    '숙성흑돼지모듬600g(2~3인)': { zh:'熟成黑猪拼盘600g(2~3人)',  en:'Aged Black Pork Set 600g (2~3)' },
+    '숙성백돼지모듬600g':         { zh:'熟成白猪拼盘600g',          en:'Aged White Pork Set 600g' },
+    '숙성흑돼지오겹살200g':       { zh:'熟成黑猪五花肉200g',        en:'Aged Black Pork Belly 200g' },
+    '숙성흑돼지목살200g':         { zh:'熟成黑猪颈肉200g',          en:'Aged Black Pork Neck 200g' },
+    '숙성흑가브리살180g':         { zh:'熟成黑猪肩胛肉180g',        en:'Aged Black Pork Shoulder 180g' },
+    '숙성황정살180g':             { zh:'熟成黄精肉180g',            en:'Aged Hwangjeong Pork 180g' },
+    '숙성불항정살200g':           { zh:'熟成秘制精肉200g',          en:'Aged Specialty Pork 200g' },
+    '양념갈비300g':               { zh:'调味排骨300g',              en:'Marinated Ribs 300g' },
+    '소갈비살 200g':              { zh:'牛排骨肉200g',              en:'Beef Short Rib 200g' },
+    '숙성백돼지오겹살200g':       { zh:'熟成白猪五花肉200g',        en:'Aged White Pork Belly 200g' },
+    '숙성백돼지목살200g':         { zh:'熟成白猪颈肉200g',          en:'Aged White Pork Neck 200g' },
+    '새우구이':                   { zh:'烤虾',                      en:'Grilled Shrimp' },
+    '목탄게란찜':                 { zh:'木炭鸡蛋羹',                en:'Charcoal Steamed Eggs' },
+    '왕갈비탕':                   { zh:'王排骨汤',                  en:'King Rib Soup' },
+    '흑돼지김치찌개':             { zh:'黑猪泡菜锅',                en:'Black Pork Kimchi Stew' },
+    '된장찌개':                   { zh:'大酱汤',                    en:'Doenjang Stew' },
+    '물냉면':                     { zh:'水冷面',                    en:'Water Cold Noodle' },
+    '비빔냉면':                   { zh:'拌冷面',                    en:'Spicy Cold Noodle' },
+    '해물전':                     { zh:'海鲜煎饼',                  en:'Seafood Pancake' },
+    '해물라면':                   { zh:'海鲜拉面',                  en:'Seafood Ramen' },
+    '김치볶음밥':                 { zh:'泡菜炒饭',                  en:'Kimchi Fried Rice' },
+    '떡볶이':                     { zh:'炒年糕',                    en:'Tteokbokki' },
+    '공기밥':                     { zh:'米饭',                      en:'Steamed Rice' },
+};
+
+/* ================================================
+   다국어 UI 텍스트
+   번역 수정이 필요하면 여기서 바꾸세요
+   ================================================ */
+const I18N = {
+    ko: {
+        hero_tag:'제주 숙성 흑돼지 전문점', hero_sub:'JEJU · PREMIUM AGED BLACK PORK',
+        about_lbl:'About', about_title:'제주의 맛,\n정성을 담다',
+        about_desc:'제주산 100% 흑돼지를 25~30일간 저온 숙성하여 육질이 부드럽고 고소한 감칠맛이 극대화된 제주 대표 고깃집입니다. 제주공항 근처, 메종글래드호텔 인근에 위치해 관광객이 찾기 편합니다.',
+        il_hours:'영업시간', iv_hours:'매일 12:00 ~ 익일 00:30',
+        il_lo:'라스트오더', il_addr:'주소', iv_addr:'제주시 신광로10길 3', il_tel:'전화',
+        menu_lbl:'Menu', menu_title:'메뉴', menu_loading:'메뉴를 불러오는 중...', menu_best:'BEST',
+        loc_lbl:'Location', loc_title:'오시는 길',
+        loc_how:'찾아가는 방법', loc_how_v:'메종글래드호텔 옆집 · 드림타워 근처\n제주공항에서 약 8분 거리',
+        contact_title:'연락처',
+        btn_call:'전화하기', btn_sms:'문자하기',
+        btn_kakao:'카카오톡 (준비중)', btn_wechat:'위챗 (준비중)', btn_share:'공유',
+    },
+    zh: {
+        hero_tag:'济州岛熟成黑猪肉专门店', hero_sub:'济州岛 · 顶级熟成黑猪肉',
+        about_lbl:'关于我们', about_title:'济州的味道,\n用心呈现',
+        about_desc:'使用100%济州产黑猪肉，经过25~30天低温熟成，肉质柔嫩，鲜味极致。位于济州机场附近，美憬阁酒店旁边，交通便利。',
+        il_hours:'营业时间', iv_hours:'每天 12:00 ~ 次日 00:30',
+        il_lo:'最后点餐', il_addr:'地址', iv_addr:'济州市新光路10街3号', il_tel:'电话',
+        menu_lbl:'菜单', menu_title:'菜单', menu_loading:'菜单加载中...', menu_best:'推荐',
+        loc_lbl:'位置', loc_title:'交通指南',
+        loc_how:'如何到达', loc_how_v:'美憬阁酒店旁边 · 梦想塔附近\n距济州机场约8分钟',
+        contact_title:'联系我们',
+        btn_call:'拨打电话', btn_sms:'发送短信',
+        btn_kakao:'KakaoTalk (准备中)', btn_wechat:'微信 (准备中)', btn_share:'分享',
+    },
+    en: {
+        hero_tag:'Jeju Aged Black Pork Specialist', hero_sub:'JEJU · PREMIUM AGED BLACK PORK',
+        about_lbl:'About', about_title:"Jeju's Finest,\nCrafted with Care",
+        about_desc:"100% Jeju black pork aged 25–30 days at low temperature for exceptional tenderness and rich umami. Conveniently located near Jeju Airport, next to Maison Glad Hotel.",
+        il_hours:'Hours', iv_hours:'Daily 12:00 ~ 00:30 (next day)',
+        il_lo:'Last Order', il_addr:'Address', iv_addr:'3, Singwang-ro 10-gil, Jeju-si', il_tel:'Phone',
+        menu_lbl:'Menu', menu_title:'Menu', menu_loading:'Loading menu...', menu_best:'BEST',
+        loc_lbl:'Location', loc_title:'Getting Here',
+        loc_how:'Directions', loc_how_v:'Next to Maison Glad Hotel · Near Dream Tower\nAbout 8 min from Jeju Airport',
+        contact_title:'Contact',
+        btn_call:'Call Now', btn_sms:'Send SMS',
+        btn_kakao:'KakaoTalk (soon)', btn_wechat:'WeChat (soon)', btn_share:'Share',
+    },
+};
+
+let lang = 'ko';
+let menuData = [];
+
+/* ================================================
+   히어로 슬라이드쇼 — 5초마다 페이드 전환
+   ================================================ */
+(function() {
+    const slides = document.querySelectorAll('.hero-slide');
+    let cur = 0;
+    setInterval(() => {
+        slides[cur].classList.remove('active');
+        cur = (cur + 1) % slides.length;
+        slides[cur].classList.add('active');
+    }, 5000);
+})();
+
+/* ================================================
+   언어 전환
+   ================================================ */
+function setLang(l) {
+    lang = l;
+    const labels = { ko:'KO', zh:'中文', en:'EN' };
+    document.querySelectorAll('.lang-btn').forEach(b => {
+        b.classList.toggle('active', b.textContent.trim() === labels[l]);
+    });
+    const t = I18N[l];
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+        const k = el.getAttribute('data-i18n');
+        if (t[k] !== undefined) el.textContent = t[k];
+    });
+    document.documentElement.lang = l === 'zh' ? 'zh-CN' : l;
+    if (menuData.length) renderMenu(menuData);
+}
+
+/* ================================================
+   CSV 파싱 — ₩85,000 쉼표 포함 가격 올바르게 처리
+   ================================================ */
+function parseCSV(text) {
+    const rows = text.trim().split('\n').slice(1);
+    return rows.map(row => {
+        const cols = [];
+        let cur = '', inQ = false;
+        for (let i = 0; i < row.length; i++) {
+            const c = row[i];
+            if (c === '"') { inQ = !inQ; }
+            else if (c === ',' && !inQ) { cols.push(cur); cur = ''; }
+            else { cur += c; }
+        }
+        cols.push(cur);
+        const name  = (cols[0] || '').trim();
+        const price = parseInt((cols[1] || '').replace(/[^0-9]/g, '')) || 0;
+        const best  = (cols[2] || '').trim().toUpperCase() === 'Y';
+        return { name, price, best };
+    }).filter(m => m.name);
+}
+
+/* ================================================
+   메뉴 카드 렌더링
+   ================================================ */
+function renderMenu(data) {
+    const t    = I18N[lang];
+    const grid = document.getElementById('menu-grid');
+    grid.innerHTML = data.map(item => {
+        let primary = item.name, secondary = '';
+        if (lang !== 'ko' && TR[item.name]) {
+            primary   = TR[item.name][lang] || item.name;
+            secondary = item.name;
+        }
+        const priceStr = item.price.toLocaleString('ko-KR') + '원';
+        const imgSrc = 'imeges/' + item.name + '.jpg';
+        const badge   = item.best ? '<div class="badge">' + (t.menu_best||'BEST') + '</div>' : '';
+        return '<div class="menu-card">'
+            + badge
+            + '<img class="menu-img" src="' + imgSrc + '" alt="' + primary + '" onerror="imgFail(this)">'
+            + '<div class="menu-body">'
+            + '<div class="menu-name">' + primary + '</div>'
+            + (secondary ? '<div class="menu-name-sub">' + secondary + '</div>' : '')
+            + '<div class="menu-price">' + priceStr + '</div>'
+            + '</div></div>';
+    }).join('');
+}
+
+/* ================================================
+   이미지 로드 실패 처리
+   ================================================ */
+function imgFail(el) {
+    const ph = document.createElement('div');
+    ph.className = 'menu-img-ph';
+    ph.textContent = '—';
+    el.parentNode.replaceChild(ph, el);
+}
+
+/* ================================================
+   공유하기
+   ================================================ */
+function sharePage() {
+    const d = {
+        title: '돈나무 | 제주 숙성 흑돼지',
+        text:  '제주공항 8분 · 100% 제주산 숙성 흑돼지 전문점',
+        url:   window.location.href,
+    };
+    if (navigator.share) { navigator.share(d).catch(() => {}); }
+    else { navigator.clipboard.writeText(d.url).then(() => alert('링크가 복사됐어요!')); }
+}
+
+/* ================================================
+   PWA 서비스워커
+   ================================================ */
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+}
+
+/* ================================================
+   메뉴 로드 — CSV 우선, 실패시 폴백
+   ================================================ */
+async function loadMenu() {
+    try {
+        const res = await fetch(CSV_URL);
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const parsed = parseCSV(await res.text());
+        menuData = parsed.length ? parsed : FALLBACK;
+    } catch(e) {
+        console.warn('CSV 실패 → 폴백:', e.message);
+        menuData = FALLBACK;
+    }
+    renderMenu(menuData);
+}
+
+document.addEventListener('DOMContentLoaded', () => { loadMenu(); setLang('ko'); });
+</script>
+</body>
+</html>
