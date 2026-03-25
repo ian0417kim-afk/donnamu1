@@ -1,0 +1,14 @@
+{
+  "name": "돈나무 | 제주 숙성 흑돼지",
+  "short_name": "돈나무",
+  "description": "제주공항 8분 · 100% 제주산 숙성 흑돼지 전문점",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#faf7f2",
+  "theme_color": "#1a0e05",
+  "orientation": "portrait",
+  "icons": [
+    { "src": "images/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "images/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}
